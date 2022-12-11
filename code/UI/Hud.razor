@@ -1,0 +1,27 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Sandbox
+@using Sandbox.UI
+@using TremblingGame.Entity
+
+@namespace TremblingGame.UI
+
+@inherits Panel
+
+<root>
+    <RemainingTiles RemainingTileCount=@ActiveTileCount() />
+</root>
+
+@code {
+    protected override int BuildHash()
+    {
+        return Time.Now.GetHashCode();
+    }
+
+    private int ActiveTileCount()
+    {
+        IEnumerable<Entity> tiles = Entity.All.Where(entity => entity is TileEntity && !((TileEntity) entity).HasFallen());
+        return tiles.Count();
+    }
+
+}
