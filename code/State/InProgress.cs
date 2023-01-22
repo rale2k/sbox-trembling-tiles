@@ -7,6 +7,8 @@ public class InProgress : BaseState
 {
 	public override void OnStart()
 	{
+		base.OnStart();
+		
 		TGame.ResetTiles();
 		foreach (var player in GameManager.GetPlayers())
 		{
@@ -16,6 +18,8 @@ public class InProgress : BaseState
 
 	public override void OnKilled( Sandbox.Entity entity )
 	{
+		base.OnKilled( entity );
+		
 		Log.Info( $"{this.ClassName}.OnKilled({entity}) - playercount = {GameManager.GetAlivePlayerCount()}" );
 		if ( GameManager.GetAlivePlayerCount() == 1 )
 		{

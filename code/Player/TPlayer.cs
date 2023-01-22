@@ -11,11 +11,11 @@ public partial class TPlayer : Sandbox.Player
 
 	public override void Respawn()
 	{
-		Game.AssertServer();
+		Log.Info($"Respawning {this}");
 
 		Controller = new TWalkController();
-
 		SetModel( "models/citizen/citizen.vmdl");
+
 		EnableAllCollisions = true;
 		EnableDrawing = true;
 		EnableHideInFirstPerson = true;
@@ -24,20 +24,11 @@ public partial class TPlayer : Sandbox.Player
 		base.Respawn();
 	}
 
-	public override void OnKilled()
-	{
-		Controller = null;
-		EnableDrawing = false;
-		LifeState = LifeState.Dead;
-		EnableAllCollisions = false;
-		Client?.AddInt( "deaths", 1 );
-
-		GameManager.Current?.OnKilled( this );
-	}
-
 	public override void Simulate( IClient cl )
 	{
-		SimulateAnimation();
+		Controller?.Simulate( cl, this );
+		
+		SimulateAnimation(Controller);
 
 		if ( Input.Pressed( InputButton.View ) )
 		{
@@ -53,8 +44,17 @@ public partial class TPlayer : Sandbox.Player
 		{
 			groundEnt.StartTremble();
 		}
+	}
 
-		GetActiveController()?.Simulate( cl, this );
+	public override void OnKilled()
+	{
+		Controller = null;
+		EnableDrawing = false;
+		LifeState = LifeState.Dead;
+		EnableAllCollisions = false;
+		Client?.AddInt( "deaths", 1 );
+
+		GameManager.Current?.OnKilled( this );
 	}
 
 	public override void FrameSimulate( IClient cl )
