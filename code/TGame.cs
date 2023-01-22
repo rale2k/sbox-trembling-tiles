@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TremblingGame.UI;
 using Sandbox;
 using TremblingGame.Entity;
 using TremblingGame.Player;
+using TremblingGame.State;
 
 namespace TremblingGame;
 
@@ -14,29 +16,38 @@ namespace TremblingGame;
 /// You can use this to create things like HUDs and declare which player class
 /// to use for spawned players.
 /// </summary>
-partial class TGame : GameManager
+public partial class TGame : GameManager
 {
+	public static TGame Current { get; private set; }
+	
+	[Net, Change]
+	public BaseState Gamestate { get; set; }
 	
 	public TGame()
 	{
+		Current = this;
+		
 		if ( Game.IsServer )
 		{
-			// Create the HUD
 			_ = new TGameUI();
 		}
 	}
-	/// <summary>
-	/// A client has joined the server. Make them a pawn to play with
-	/// </summary>
+
 	public override void ClientJoined( IClient client )
 	{
-		base.ClientJoined( client );
-			
-		// Create a pawn for this client to play with
-		var player = new TPlayer();
-		client.Pawn = player;
-		
-		player.Respawn();
+		Gamestate.OnPlayerJoin(client);
+	}
+
+	public override void OnKilled( Sandbox.Entity pawn )
+	{
+		base.OnKilled( pawn );
+		Gamestate.OnKilled(pawn);
+	}
+
+	[Event.Tick]
+	public void OnTick()
+	{
+		Gamestate.OnTick();
 	}
 
 	public override void MoveToSpawnpoint( Sandbox.Entity pawn )
@@ -59,17 +70,38 @@ partial class TGame : GameManager
 		pawn.Transform = tileEntTransform;
 
 	}
-
-	[ConCmd.AdminAttribute( "trt_resettiles", Help = "Reset all trembling tiles")]
-	static void ResetTiles()
-	{
-		var tremblingTiles = All.Where( ent => ent is TileEntity );
 		
-		foreach (var tremblingTile in tremblingTiles)
-		{
-			(tremblingTile as TileEntity)?.ResetTile();
-		}
+	public override void PostLevelLoaded()	
+	{
+		ChangeGameState(new Waiting());
 	}
 
+	public ICollection<TPlayer> GetPlayers()
+	{
+		return All.OfType<TPlayer>().ToList();
+	}
+	
+	public int GetPlayerCount()
+	{
+		return All.OfType<TPlayer>().Count();
+	}
 
+	public int GetAlivePlayerCount()
+	{
+		return All.OfType<TPlayer>().Count( player => player.LifeState == LifeState.Alive );
+	}
+
+	public void ChangeGameState(BaseState state)
+	{
+		Game.AssertServer();
+		
+		Gamestate = state;
+		Gamestate.OnStart();
+	}
+
+	private void OnGamestateChanged(BaseState oldState, BaseState newState)
+	{
+		Log.Info($"Changing state to {newState.GetState()}");
+		Gamestate = newState;
+	}
 }

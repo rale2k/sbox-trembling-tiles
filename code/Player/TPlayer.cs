@@ -1,80 +1,69 @@
-﻿using Sandbox;
+﻿using System.Linq;
+using Sandbox;
+using Sandbox.Diagnostics;
 using TremblingGame.Entity;
 
 namespace TremblingGame.Player;
 
 public partial class TPlayer : Sandbox.Player 
 {
-	[Net, Predicted]
 	public bool ThirdPersonCamera { get; set; }
-	
+
 	public override void Respawn()
 	{
-		base.Respawn();
+		Game.AssertServer();
+
+		Controller = new TWalkController();
 
 		SetModel( "models/citizen/citizen.vmdl");
-		
-		Controller = new TWalkController();
 		EnableAllCollisions = true;
 		EnableDrawing = true;
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
+		
+		base.Respawn();
 	}
 
 	public override void OnKilled()
 	{
-		base.OnKilled();
-		
 		Controller = null;
-		EnableAllCollisions = false;
 		EnableDrawing = false;
+		LifeState = LifeState.Dead;
+		EnableAllCollisions = false;
+		Client?.AddInt( "deaths", 1 );
+
+		GameManager.Current?.OnKilled( this );
 	}
 
 	public override void Simulate( IClient cl )
 	{
+		SimulateAnimation();
+
 		if ( Input.Pressed( InputButton.View ) )
 		{
 			ThirdPersonCamera = !ThirdPersonCamera;
 		}
-		
+
 		if (Input.Pressed(InputButton.SecondaryAttack) && Game.IsClient)
 		{
 			TraceRay();
 		}
 
-		TileEntity groundEnt = GroundEntity as TileEntity;
-		if ( groundEnt != null && Game.IsServer)
+		if ( GroundEntity is TileEntity groundEnt && Game.IsServer)
 		{
 			groundEnt.StartTremble();
 		}
-		
-		var controller = GetActiveController();
-		if ( controller != null )
-		{
-			EnableSolidCollisions = !controller.HasTag( "noclip" );
 
-			SimulateAnimation( controller );
-		}
-		
-		base.Simulate( cl );
-	}
-
-	private void TraceRay()
-	{
-		Vector3 targetPos = EyePosition + EyeRotation.Forward * 64;
-		TraceResult result = Trace.Ray(EyePosition, targetPos)
-			.Ignore(this)
-			.Run();
-		Log.Info(result.Entity);
+		GetActiveController()?.Simulate( cl, this );
 	}
 
 	public override void FrameSimulate( IClient cl )
 	{
 		Camera.Rotation = ViewAngles.ToRotation();
+		Camera.FieldOfView = Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView );
 		
 		if ( ThirdPersonCamera )
 		{
-			Camera.FieldOfView = Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView );
 			Camera.FirstPersonViewer = null;
 
 			Vector3 targetPos;
@@ -103,6 +92,13 @@ public partial class TPlayer : Sandbox.Player
 			Camera.Main.SetViewModelCamera( Camera.FieldOfView );
 		}
 	}
-	
 
+	private void TraceRay()
+	{
+		Vector3 targetPos = EyePosition + EyeRotation.Forward * 64;
+		TraceResult result = Trace.Ray(EyePosition, targetPos)
+			.Ignore(this)
+			.Run();
+		Log.Info($"Traceray result: {result.Entity}");
+	}
 }

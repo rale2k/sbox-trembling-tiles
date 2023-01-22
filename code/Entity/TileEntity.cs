@@ -5,7 +5,7 @@ using Sandbox;
 namespace TremblingGame.Entity;
 
 /// <summary>
-/// This entity represents a trembling tile
+/// A tile that trembles
 /// </summary>
 [Library( "trembling_tile" ), HammerEntity]
 [Category("TremblingTile")]
@@ -14,10 +14,7 @@ namespace TremblingGame.Entity;
 [Solid]
 partial class TileEntity : ModelEntity
 {
-	[ConVar.Replicated("trt_tile_tremble_time", 
-		Help = "Time after which a tile disappears after a player has stepped on it")
-	]
-	private static int TremblingTimeInSeconds{ get; set; } = 2;
+
 	
 	[Net] 
 	private TimeUntil? TimeUntilTremble { get; set; }
@@ -68,7 +65,7 @@ partial class TileEntity : ModelEntity
 	{
 		if (Game.IsServer && !TimeUntilTremble.HasValue)
 		{
-			TimeUntilTremble = TremblingTimeInSeconds;
+			TimeUntilTremble = TGame.TremblingTimeInSeconds;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 {
   "cloud_packages": [],
   "game_packages": [
-    "local.test_addon"
+    "local.trembling_tiles"
   ],
   "addon_packages": []
 }

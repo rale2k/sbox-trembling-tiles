@@ -1,8 +1,11 @@
-﻿@using System.Collections.Generic
+﻿@using System
+@using System.Collections.Generic
 @using System.Linq
 @using Sandbox
 @using Sandbox.UI
 @using TremblingGame.Entity
+@using TremblingGame.Player
+@using TremblingGame.State
 
 @namespace TremblingGame.UI
 
@@ -10,7 +13,11 @@
 
 <root>
     <RemainingTiles RemainingTileCount=@ActiveTileCount() />
-</root>
+    @if (TGame.Current.Gamestate.GetState() == BaseState.State.Roundend)
+    {
+        <span>@GetFirstAlivePlayer()</span>
+    }
+    </root>
 
 @code {
     protected override int BuildHash()
@@ -22,6 +29,11 @@
     {
         IEnumerable<Entity> tiles = Entity.All.Where(entity => entity is TileEntity && !((TileEntity) entity).HasFallen());
         return tiles.Count();
+    }
+
+    private String GetFirstAlivePlayer()
+    {
+        return Entity.All.First(entity => entity is IClient).Name;
     }
 
 }
