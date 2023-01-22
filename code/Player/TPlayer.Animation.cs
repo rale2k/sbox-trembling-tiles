@@ -10,6 +10,7 @@ partial class TPlayer
 		{
 			return;
 		}
+
 		// where should we be rotated to
 		var turnSpeed = 0.02f;
 

@@ -1,6 +1,6 @@
-﻿using System;
-using Editor;
+﻿using Editor;
 using Sandbox;
+using static TremblingGame.State.State;
 
 namespace TremblingGame.Entity;
 
@@ -8,17 +8,14 @@ namespace TremblingGame.Entity;
 /// A tile that trembles
 /// </summary>
 [Library( "trembling_tile" ), HammerEntity]
-[Category("TremblingTile")]
+[Category( "TremblingTile" )]
 [Title( "A Trembling Tile" )]
 [EditorModel( "models/tt-tile.vmdl" )]
 [Solid]
 partial class TileEntity : ModelEntity
 {
+	[Net] private TimeUntil? TimeUntilTremble { get; set; }
 
-	
-	[Net] 
-	private TimeUntil? TimeUntilTremble { get; set; }
-	
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -39,22 +36,22 @@ partial class TileEntity : ModelEntity
 	{
 		return TimeUntilTremble.HasValue && TimeUntilTremble.Value.Fraction >= 1;
 	}
-	
+
 	[Event.Tick]
 	public void Tremble()
 	{
 		if ( !TimeUntilTremble.HasValue )
 			return;
-		
-		if (!HasFallen())
+
+		if ( !HasFallen() )
 		{
-			DebugOverlay.Text(TimeUntilTremble.Value.Fraction.ToString(), Position);
 			var newRenderColor = RenderColor;
 			newRenderColor.b = 1 - TimeUntilTremble.Value.Fraction;
 			newRenderColor.g = 1 - TimeUntilTremble.Value.Fraction;
 
 			RenderColor = newRenderColor;
-		} else
+		}
+		else
 		{
 			EnableDrawing = false;
 			EnableAllCollisions = false;
@@ -63,7 +60,7 @@ partial class TileEntity : ModelEntity
 
 	public void StartTremble()
 	{
-		if (Game.IsServer && !TimeUntilTremble.HasValue)
+		if ( Game.IsServer && !TimeUntilTremble.HasValue && TGame.Current.Gamestate == Inprogress )
 		{
 			TimeUntilTremble = TGame.TremblingTimeInSeconds;
 		}

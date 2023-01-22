@@ -5,8 +5,7 @@ namespace TremblingGame.State;
 
 public abstract partial class BaseState : BaseNetworkable
 {
-	[Net]
-	public TimeUntil? TimeRemaining { get; set; }
+	[Net] public TimeUntil? TimeRemaining { get; set; }
 
 	public virtual int Duration => 0;
 
@@ -16,21 +15,16 @@ public abstract partial class BaseState : BaseNetworkable
 	{
 		var player = new TPlayer();
 		client.Pawn = player;
-		if ( Game.IsServer )
-		{
-			Log.Info($"{player}");
-		}
 	}
 
-	public abstract State GetState();
-
-	public virtual void OnStart(bool setForced)
+	public virtual void OnStart( bool setForced )
 	{
 		if ( setForced )
 		{
 			Forced = true;
 			return;
 		}
+
 		if ( Duration > 0 )
 		{
 			TimeRemaining = Duration;
@@ -44,15 +38,14 @@ public abstract partial class BaseState : BaseNetworkable
 			OnTimeUp();
 		}
 	}
-	
-	public virtual void OnTimeUp(){}
 
-	public virtual void OnKilled( Sandbox.Entity entity ){}
+	protected virtual void OnTimeUp() { }
 
-	public enum State
-	{
-		Waiting,
-		Inprogress,
-		Roundend
-	}
+	public virtual void OnKilled( Sandbox.Entity entity ) { }
+
+	public abstract State GetState();
+
+	public static bool operator ==( BaseState left, State right ) => left?.GetState() == right;
+
+	public static bool operator !=( BaseState left, State right ) => left?.GetState() != right;
 }

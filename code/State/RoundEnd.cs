@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using TremblingGame.Events;
+using TremblingGame.UI.Notifications;
 
 namespace TremblingGame.State;
 
@@ -10,13 +10,13 @@ public partial class RoundEnd : BaseState
 	public override void OnStart( bool setForced )
 	{
 		base.OnStart( setForced );
-		
-		Event.Run( GameEvent.Notification.Create, "Round over!" );
+
+		CenterNotification.CreateCenterNotification( "Round over!" );
 	}
 
-	public override void OnTimeUp()
+	protected override void OnTimeUp()
 	{
-		BaseState newState = TGame.Current.GetPlayerCount() >= TGame.MinPlayers ? new InProgress() : new Waiting();
+		BaseState newState = TGame.Current.GetPlayerCount() >= TGame.MinPlayers ? new RoundStart() : new Waiting();
 		TGame.Current.ChangeGameState( newState );
 	}
 

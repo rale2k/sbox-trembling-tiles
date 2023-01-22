@@ -1,0 +1,54 @@
+﻿@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Sandbox
+@using TremblingGame.Entity
+@using static TremblingGame.State.State
+@namespace TremblingGame.UI.PlayerInfo
+
+@inherits Sandbox.UI.Panel
+
+<root class="@(TGame.Current.Gamestate == Inprogress ? "show" : "")">
+    <label class="value">Remaining Tiles: @ActiveTileCount()</label>
+</root>
+
+@code {
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine(ActiveTileCount(), TGame.Current.Gamestate);
+    }
+
+    private int ActiveTileCount()
+    {
+        IEnumerable<Entity> tiles = Entity.All.Where(entity => entity is TileEntity && !((TileEntity)entity).HasFallen());
+        return tiles.Count();
+    }
+
+}
+
+<style>
+    RemainingTiles
+    {
+      margin: auto;
+      position: absolute;
+      width: 340px;
+      border-radius: 20px;
+      bottom: 30px;
+      left: 30px;
+      font-size: 30px;
+      font-weight: bold;
+      color: white;
+      height: 80px;
+      padding: 0 10px;
+      align-items: center;
+      font-family: Poppins;
+      background-color: rgba( #111, 0.2 );
+      
+      opacity: 0;
+      
+      &.show {
+        opacity: 1;
+      }
+    }
+</style>

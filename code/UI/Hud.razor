@@ -1,5 +1,7 @@
 ﻿@using Sandbox
 @using Sandbox.UI
+@using TremblingGame.UI.PlayerInfo
+@using TremblingGame.UI.Notifications
 
 @inherits RootPanel
 @namespace TremblingGame.UI
@@ -11,14 +13,17 @@
 </root>
 
 @code {
+
     public Hud()
     {
         Game.RootPanel = this;
     }
+
     protected override int BuildHash()
     {
         return Time.Now.GetHashCode();
     }
+
 }
 
 <style>

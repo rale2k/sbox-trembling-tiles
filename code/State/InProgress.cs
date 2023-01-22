@@ -5,35 +5,33 @@ namespace TremblingGame.State;
 
 public partial class InProgress : BaseState
 {
-	public override void OnStart(bool setForced)
+	public override void OnStart( bool setForced )
 	{
-		base.OnStart(setForced);
-		
-		TGame.ResetTiles();
-		foreach (var player in TGame.Current.GetPlayers())
+		base.OnStart( setForced );
+
+		foreach ( var player in TGame.Current.GetPlayers() )
 		{
-			player.Respawn();
+			player.ToggleFreeze();
 		}
 	}
 
 	public override void OnKilled( Sandbox.Entity entity )
 	{
 		base.OnKilled( entity );
-		
+
 		if ( TGame.Current.GetAlivePlayerCount() < 2 )
 		{
-			
 			TGame.Current.ChangeGameState( new RoundEnd() );
 		}
 	}
 
-	public override void OnPlayerJoin(IClient client)
+	public override void OnPlayerJoin( IClient client )
 	{
-		base.OnPlayerJoin(client);
-		
+		base.OnPlayerJoin( client );
+
 		TPlayer player = client.Pawn as TPlayer;
-        player.EnableDrawing = false;
-        player.EnableAllCollisions = false;
+		player.EnableDrawing = false;
+		player.EnableAllCollisions = false;
 	}
 
 	public override State GetState()

@@ -5,9 +5,11 @@ using TremblingGame.Entity;
 
 namespace TremblingGame.Player;
 
-public partial class TPlayer : Sandbox.Player 
+public partial class TPlayer : Sandbox.Player
 {
 	public bool ThirdPersonCamera { get; set; }
+
+	public bool Frozen { get; set; }
 
 	public override void Spawn()
 	{
@@ -26,7 +28,7 @@ public partial class TPlayer : Sandbox.Player
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
 	}
-	
+
 	public override void Respawn()
 	{
 		Controller = new TWalkController();
@@ -40,21 +42,18 @@ public partial class TPlayer : Sandbox.Player
 
 	public override void Simulate( IClient cl )
 	{
-		Controller?.Simulate( cl, this );
-		
-		SimulateAnimation(Controller);
+		if ( !Frozen )
+		{
+			Controller?.Simulate( cl, this );
+		}
+		SimulateAnimation( Controller );
 
 		if ( Input.Pressed( InputButton.View ) )
 		{
 			ThirdPersonCamera = !ThirdPersonCamera;
 		}
 
-		if (Input.Pressed(InputButton.SecondaryAttack) && Game.IsClient)
-		{
-			TraceRay();
-		}
-
-		if ( GroundEntity is TileEntity groundEnt && Game.IsServer)
+		if ( GroundEntity is TileEntity groundEnt && Game.IsServer )
 		{
 			groundEnt.StartTremble();
 		}
@@ -75,7 +74,7 @@ public partial class TPlayer : Sandbox.Player
 	{
 		Camera.Rotation = ViewAngles.ToRotation();
 		Camera.FieldOfView = Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView );
-		
+
 		if ( ThirdPersonCamera )
 		{
 			Camera.FirstPersonViewer = null;
@@ -107,12 +106,9 @@ public partial class TPlayer : Sandbox.Player
 		}
 	}
 
-	private void TraceRay()
+	public void ToggleFreeze()
 	{
-		Vector3 targetPos = EyePosition + EyeRotation.Forward * 64;
-		TraceResult result = Trace.Ray(EyePosition, targetPos)
-			.Ignore(this)
-			.Run();
-		Log.Info($"Traceray result: {result.Entity}");
+		Game.AssertServer();
+		Frozen = !Frozen;
 	}
 }

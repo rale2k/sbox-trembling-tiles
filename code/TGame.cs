@@ -19,27 +19,26 @@ namespace TremblingGame;
 public partial class TGame : GameManager
 {
 	public static TGame Current { get; private set; }
-	
-	[Net, Change]
-	public BaseState Gamestate { get; set; }
-	
+
+	[Net, Change] public BaseState Gamestate { get; set; }
+
 	public TGame()
 	{
 		Current = this;
-		
+
 		if ( Game.IsClient )
 			_ = new UI.Hud();
 	}
 
 	public override void ClientJoined( IClient client )
 	{
-		Gamestate.OnPlayerJoin(client);
+		Gamestate.OnPlayerJoin( client );
 	}
 
 	public override void OnKilled( Sandbox.Entity pawn )
 	{
 		base.OnKilled( pawn );
-		Gamestate.OnKilled(pawn);
+		Gamestate.OnKilled( pawn );
 	}
 
 	[Event.Tick]
@@ -51,7 +50,7 @@ public partial class TGame : GameManager
 	public override void MoveToSpawnpoint( Sandbox.Entity pawn )
 	{
 		var tileEnt = All
-			.OfType<TileEntity>().MinBy(_ => Guid.NewGuid()); 
+			.OfType<TileEntity>().MinBy( _ => Guid.NewGuid() );
 
 		if ( tileEnt == null )
 		{
@@ -64,21 +63,20 @@ public partial class TGame : GameManager
 		tileEntPosition.z += 8;
 
 		tileEntTransform.Position = tileEntPosition;
-		
-		pawn.Transform = tileEntTransform;
 
+		pawn.Transform = tileEntTransform;
 	}
-		
-	public override void PostLevelLoaded()	
+
+	public override void PostLevelLoaded()
 	{
-		ChangeGameState(new Waiting());
+		ChangeGameState( new Waiting() );
 	}
 
 	public ICollection<TPlayer> GetPlayers()
 	{
 		return All.OfType<TPlayer>().ToList();
 	}
-	
+
 	public int GetPlayerCount()
 	{
 		return All.OfType<TPlayer>().Count();
@@ -89,17 +87,17 @@ public partial class TGame : GameManager
 		return All.OfType<TPlayer>().Count( player => player.LifeState == LifeState.Alive );
 	}
 
-	public void ChangeGameState(BaseState state, bool forced = false)
+	public void ChangeGameState( BaseState state, bool forced = false )
 	{
 		Game.AssertServer();
-		
+
 		Gamestate = state;
-		Gamestate.OnStart(forced);
+		Gamestate.OnStart( forced );
 	}
 
-	private void OnGamestateChanged(BaseState oldState, BaseState newState)
+	private void OnGamestateChanged( BaseState oldState, BaseState newState )
 	{
-		Log.Info($"Changing state to {newState.GetState()}");
+		Log.Info( $"Changing state to {newState.GetState()}" );
 		Gamestate = newState;
 	}
 }
