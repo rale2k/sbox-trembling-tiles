@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Sandbox;
 using TremblingGame.Entity;
+using TremblingGame.Events;
 using TremblingGame.Player;
 using TremblingGame.State;
 
@@ -35,14 +36,29 @@ public partial class TGame
 	public static void StartGame()
 	{
 		Current.ChangeGameState( new InProgress() );
-	}
+	}	
 	
-	[ConCmd.Admin( "test_respawn", Help = "respawn" )]
-	public static void Respawn()
+	[ConCmd.Client( "trt_testnotification", Help = "Test notification" )]
+	public static void TestNotification(string text)
 	{
-		foreach (var deathmatchPlayer in All.OfType<TPlayer>())
+		Event.Run( GameEvent.Notification.Create, text );
+	}	
+	
+	[ConCmd.Admin( "trt_forcestate", Help = "Force game state" )]
+	public static void ForceState(string state)
+	{
+		if (state == "waiting")
 		{
-			deathmatchPlayer.Respawn();
+			Current.ChangeGameState( new Waiting(), true );
+		}
+		else if ( state == "inprogress" )
+		{
+			Current.ChangeGameState( new InProgress(), true );
+		}
+		else if ( state == "roundend" )
+		{
+			Current.ChangeGameState( new RoundEnd(), true );
 		}
 	}
+
 }

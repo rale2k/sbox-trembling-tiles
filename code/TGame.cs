@@ -27,10 +27,8 @@ public partial class TGame : GameManager
 	{
 		Current = this;
 		
-		if ( Game.IsServer )
-		{
-			_ = new TGameUI();
-		}
+		if ( Game.IsClient )
+			_ = new UI.Hud();
 	}
 
 	public override void ClientJoined( IClient client )
@@ -91,12 +89,12 @@ public partial class TGame : GameManager
 		return All.OfType<TPlayer>().Count( player => player.LifeState == LifeState.Alive );
 	}
 
-	public void ChangeGameState(BaseState state)
+	public void ChangeGameState(BaseState state, bool forced = false)
 	{
 		Game.AssertServer();
 		
 		Gamestate = state;
-		Gamestate.OnStart();
+		Gamestate.OnStart(forced);
 	}
 
 	private void OnGamestateChanged(BaseState oldState, BaseState newState)

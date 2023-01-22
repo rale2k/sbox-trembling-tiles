@@ -1,39 +1,30 @@
-﻿@using System
-@using System.Collections.Generic
-@using System.Linq
-@using Sandbox
+﻿@using Sandbox
 @using Sandbox.UI
-@using TremblingGame.Entity
-@using TremblingGame.Player
-@using TremblingGame.State
 
+@inherits RootPanel
 @namespace TremblingGame.UI
 
-@inherits Panel
-
 <root>
-    <RemainingTiles RemainingTileCount=@ActiveTileCount() />
-    @if (TGame.Current.Gamestate.GetState() == BaseState.State.Roundend)
-    {
-        <span>@GetFirstAlivePlayer()</span>
-    }
-    </root>
+    <CenterNotificationArea/>
+    <RemainingTiles/>
+    <ChatBox/>
+</root>
 
 @code {
+    public Hud()
+    {
+        Game.RootPanel = this;
+    }
     protected override int BuildHash()
     {
         return Time.Now.GetHashCode();
     }
-
-    private int ActiveTileCount()
-    {
-        IEnumerable<Entity> tiles = Entity.All.Where(entity => entity is TileEntity && !((TileEntity) entity).HasFallen());
-        return tiles.Count();
-    }
-
-    private String GetFirstAlivePlayer()
-    {
-        return Entity.All.First(entity => entity is IClient).Name;
-    }
-
 }
+
+<style>
+    Hud {
+      height: 100%;
+      width: 100%;
+      justify-content: center;
+    }  
+</style>

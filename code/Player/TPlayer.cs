@@ -9,18 +9,32 @@ public partial class TPlayer : Sandbox.Player
 {
 	public bool ThirdPersonCamera { get; set; }
 
+	public override void Spawn()
+	{
+		base.Spawn();
+
+		SetModel( "models/citizen/citizen.vmdl" );
+
+		Health = 0;
+		LifeState = LifeState.Respawnable;
+		Transmit = TransmitType.Always;
+
+		EnableTouch = false;
+		EnableDrawing = false;
+		EnableAllCollisions = false;
+		EnableLagCompensation = true;
+		EnableHideInFirstPerson = true;
+		EnableShadowInFirstPerson = true;
+	}
+	
 	public override void Respawn()
 	{
-		Log.Info($"Respawning {this}");
-
 		Controller = new TWalkController();
-		SetModel( "models/citizen/citizen.vmdl");
 
 		EnableAllCollisions = true;
 		EnableDrawing = true;
-		EnableHideInFirstPerson = true;
-		EnableShadowInFirstPerson = true;
-		
+		EnableTouch = true;
+
 		base.Respawn();
 	}
 

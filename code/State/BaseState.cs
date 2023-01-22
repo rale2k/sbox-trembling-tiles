@@ -10,24 +10,27 @@ public abstract partial class BaseState : BaseNetworkable
 
 	public virtual int Duration => 0;
 
-	protected readonly TGame GameManager;
-
-	protected BaseState()
-	{
-		GameManager = TGame.Current;
-	}
+	public bool Forced { get; set; }
 
 	public virtual void OnPlayerJoin( IClient client )
 	{
 		var player = new TPlayer();
 		client.Pawn = player;
+		if ( Game.IsServer )
+		{
+			Log.Info($"{player}");
+		}
 	}
 
 	public abstract State GetState();
 
-	public virtual void OnStart()
+	public virtual void OnStart(bool setForced)
 	{
-		Log.Info($"{this.ClassName}.OnStart() -> {Duration}");
+		if ( setForced )
+		{
+			Forced = true;
+			return;
+		}
 		if ( Duration > 0 )
 		{
 			TimeRemaining = Duration;
@@ -38,7 +41,6 @@ public abstract partial class BaseState : BaseNetworkable
 	{
 		if ( TimeRemaining != null && TimeRemaining.Value && Game.IsServer )
 		{
-			Log.Info($"{this.ClassName}.Ontick() -> {TimeRemaining}");
 			OnTimeUp();
 		}
 	}

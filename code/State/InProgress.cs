@@ -3,14 +3,14 @@ using TremblingGame.Player;
 
 namespace TremblingGame.State;
 
-public class InProgress : BaseState
+public partial class InProgress : BaseState
 {
-	public override void OnStart()
+	public override void OnStart(bool setForced)
 	{
-		base.OnStart();
+		base.OnStart(setForced);
 		
 		TGame.ResetTiles();
-		foreach (var player in GameManager.GetPlayers())
+		foreach (var player in TGame.Current.GetPlayers())
 		{
 			player.Respawn();
 		}
@@ -20,10 +20,10 @@ public class InProgress : BaseState
 	{
 		base.OnKilled( entity );
 		
-		Log.Info( $"{this.ClassName}.OnKilled({entity}) - playercount = {GameManager.GetAlivePlayerCount()}" );
-		if ( GameManager.GetAlivePlayerCount() == 1 )
+		if ( TGame.Current.GetAlivePlayerCount() < 2 )
 		{
-			GameManager.ChangeGameState( new RoundEnd() );
+			
+			TGame.Current.ChangeGameState( new RoundEnd() );
 		}
 	}
 

@@ -5,6 +5,7 @@ namespace TremblingGame.State;
 
 public class Waiting : BaseState
 {
+
 	public override void OnPlayerJoin(IClient client)
 	{
 		base.OnPlayerJoin(client);
@@ -13,9 +14,9 @@ public class Waiting : BaseState
 		player.EnableDrawing = false;
 		player.EnableAllCollisions = false;
 
-		if ( GameManager.GetPlayerCount() >= TGame.MinPlayers )
+		if ( TGame.Current.GetPlayerCount() >= TGame.MinPlayers )
 		{
-			GameManager.ChangeGameState( new InProgress() );
+			TGame.Current.ChangeGameState( new InProgress() );
 		}
 	}
 
