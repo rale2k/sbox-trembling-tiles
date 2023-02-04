@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using TremblingGame.Player;
+using TremblingGame.Util;
 
 namespace TremblingGame.State;
 
@@ -13,7 +14,7 @@ public class Waiting : BaseState
 		player.EnableDrawing = false;
 		player.EnableAllCollisions = false;
 
-		if ( TGame.Current.GetPlayerCount() >= TGame.MinPlayers )
+		if ( Players.GetPlayerCount() >= TGame.MinPlayers )
 		{
 			TGame.Current.ChangeGameState( new RoundStart() );
 		}

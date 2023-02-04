@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using TremblingGame.Player;
+using TremblingGame.Util;
 
 namespace TremblingGame.State;
 
@@ -9,7 +10,7 @@ public partial class InProgress : BaseState
 	{
 		base.OnStart( setForced );
 
-		foreach ( var player in TGame.Current.GetPlayers() )
+		foreach ( var player in Players.GetPlayers() )
 		{
 			player.ToggleFreeze();
 		}
@@ -19,7 +20,7 @@ public partial class InProgress : BaseState
 	{
 		base.OnKilled( entity );
 
-		if ( TGame.Current.GetAlivePlayerCount() < 2 )
+		if ( Players.GetAlivePlayerCount() < 2 )
 		{
 			TGame.Current.ChangeGameState( new RoundEnd() );
 		}

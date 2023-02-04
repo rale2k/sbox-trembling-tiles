@@ -60,7 +60,7 @@ public partial class TGame : GameManager
 
 		var tileEntTransform = tileEnt.Transform;
 		var tileEntPosition = tileEnt.Position;
-		tileEntPosition.z += 8;
+		tileEntPosition.z += 5;
 
 		tileEntTransform.Position = tileEntPosition;
 
@@ -70,21 +70,6 @@ public partial class TGame : GameManager
 	public override void PostLevelLoaded()
 	{
 		ChangeGameState( new Waiting() );
-	}
-
-	public ICollection<TPlayer> GetPlayers()
-	{
-		return All.OfType<TPlayer>().ToList();
-	}
-
-	public int GetPlayerCount()
-	{
-		return All.OfType<TPlayer>().Count();
-	}
-
-	public int GetAlivePlayerCount()
-	{
-		return All.OfType<TPlayer>().Count( player => player.LifeState == LifeState.Alive );
 	}
 
 	public void ChangeGameState( BaseState state, bool forced = false )

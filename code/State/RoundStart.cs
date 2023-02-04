@@ -1,4 +1,6 @@
-﻿namespace TremblingGame.State;
+﻿using TremblingGame.Util;
+
+namespace TremblingGame.State;
 
 public class RoundStart : BaseState
 {
@@ -9,7 +11,7 @@ public class RoundStart : BaseState
 		base.OnStart( setForced );
 		
 		TGame.ResetTiles();
-		foreach ( var player in TGame.Current.GetPlayers() )
+		foreach ( var player in Players.GetPlayers() )
 		{
 			player.Respawn();
 			player.ToggleFreeze();

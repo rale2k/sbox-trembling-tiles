@@ -9,7 +9,7 @@ public partial class TPlayer : Sandbox.Player
 {
 	public bool ThirdPersonCamera { get; set; }
 
-	public bool Frozen { get; set; }
+	[Net] public bool Frozen { get; set; }
 
 	public override void Spawn()
 	{
@@ -32,7 +32,6 @@ public partial class TPlayer : Sandbox.Player
 	public override void Respawn()
 	{
 		Controller = new TWalkController();
-
 		EnableAllCollisions = true;
 		EnableDrawing = true;
 		EnableTouch = true;
@@ -42,21 +41,15 @@ public partial class TPlayer : Sandbox.Player
 
 	public override void Simulate( IClient cl )
 	{
-		if ( !Frozen )
-		{
-			Controller?.Simulate( cl, this );
-		}
+		if ( Input.Pressed( InputButton.View ) )
+			ThirdPersonCamera = !ThirdPersonCamera;
+
+		Controller?.Simulate( cl, this );
+		
 		SimulateAnimation( Controller );
 
-		if ( Input.Pressed( InputButton.View ) )
-		{
-			ThirdPersonCamera = !ThirdPersonCamera;
-		}
-
 		if ( GroundEntity is TileEntity groundEnt && Game.IsServer )
-		{
 			groundEnt.StartTremble();
-		}
 	}
 
 	public override void OnKilled()
