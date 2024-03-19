@@ -1,9 +1,2 @@
 # Trembling Tiles
-
-## TODO / timeline
- - [ ] Spectating
- - [ ] UI elements
-	 - [ ] Game state description (what to do)
-	 - [ ] Players remaining
-	 - [ ] Scoreboard (alive, wins, ...?)
- - [ ] Publish
+Abandoned, likely doesn't work anymore with all the API changes
